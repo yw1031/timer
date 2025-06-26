@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>학급 수행평가용 타이머</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #container {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: stretch;
+            width: 100vw;
+            height: 100%;
+        }
+        #today-date-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50vw;
+            justify-content: center;
+        }
+        #today-date {
+            width: 33.33vw;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+        }
+        #period-area {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        button {
+            font-size: 1em;
+            margin: 6px;
+            padding: 6px 14px;
+        }
+        .period-btn {
+            font-size: 1.2em;
+            padding: 8px 18px;
+            margin: 0 4px;
+            border: 2px solid #1976d2;
+            border-radius: 10px;
+            background: #fff;
+            color: #1976d2;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-weight: bold;
+        }
+        .period-btn.selected {
+            background: #1976d2;
+            color: #fff;
+        }
+        #main-content {
+            width: 60vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #timer {
+            font-size: 8em;
+            margin: 40px 0 40px 0;
+            align-self: center;
+        }
+        #time-select-area {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .time-btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 0;
+        }
+        .time-btn {
+            font-size: 1.2em;
+            padding: 8px 18px;
+            margin: 0 4px;
+            border: 2px solid #388e3c;
+            border-radius: 10px;
+            background: #fff;
+            color: #388e3c;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-weight: bold;
+        }
+        .time-btn.selected {
+            background: #388e3c;
+            color: #fff;
+        }
+        #attendance-box {
+            width: 80%;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #attendance-box label {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        #attendance-input {
+            font-size: 1.2em;
+            width: 100%;
+            min-height: 200px;
+            padding: 8px;
+            resize: vertical;
+            border: 1.5px solid #aaa;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        @media (max-width: 800px) {
+            #today-date, #main-content {
+                width: 100vw;
+            }
+            #container {
+                flex-direction: column;
+                align-items: center;
+            }
+            #main-content {
+                align-items: center;
+            }
+            #time-select-area, .time-btn-row {
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 style="width:100vw; text-align:center; margin-top:0; margin-bottom:0; font-size:3em; position:fixed; top:0; left:0; z-index:10; background:#fff;">
+        <span style="font-size:1em; letter-spacing:0.5em; margin-right:3em;">학년&nbsp;&nbsp;&nbsp;&nbsp;반</span>수행평가
+    </h1>
+    <div id="alert-banner" style="display:none; width:100vw; text-align:center; color:#fff; background:#d32f2f; font-size:2em; font-weight:bold; position:fixed; top:100px; left:0; z-index:20; padding:18px 0 12px 0;"></div>
+    <div style="height:150px;"></div>
+    <div id="container">
+        <div id="today-date-area">
+            <div id="today-date"></div>
+            <div id="period-area">
+                <div class="period-btn-row">
+                    <button class="period-btn" data-period="1">1교시</button>
+                    <button class="period-btn" data-period="2">2교시</button>
+                    <button class="period-btn" data-period="3">3교시</button>
+                    <button class="period-btn" data-period="4">4교시</button>
+                </div>
+                <div class="period-btn-row">
+                    <button class="period-btn" data-period="5">5교시</button>
+                    <button class="period-btn" data-period="6">6교시</button>
+                    <button class="period-btn" data-period="7">7교시</button>
+                </div>
+            </div>
+            <div id="attendance-box">
+                <label for="attendance-input">출결</label>
+                <textarea id="attendance-input"></textarea>
+            </div>
+        </div>
+        <div id="main-content">
+            <div id="timer">01:00</div>
+            <div id="time-select-area">
+                <div class="time-btn-row">
+                    <button class="time-btn" data-min="0" data-sec="1">1초</button>
+                    <button class="time-btn" data-min="0" data-sec="10">10초</button>
+                    <button class="time-btn" data-min="0" data-sec="30">30초</button>
+                </div>
+                <div class="time-btn-row">
+                    <button class="time-btn" data-min="1" data-sec="0">1분</button>
+                    <button class="time-btn" data-min="5" data-sec="0">5분</button>
+                    <button class="time-btn" data-min="10" data-sec="0">10분</button>
+                </div>
+            </div>
+            <div class="timer-buttons" style="align-self:center;">
+                <button onclick="startTimer()">시작</button>
+                <button onclick="pauseTimer()">일시정지</button>
+                <button onclick="resetTimer()">리셋</button>
+            </div>
+            <audio id="alarm" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae7e2.mp3"></audio>
+        </div>
+    </div>
+    <script>
+        // 오늘 날짜 표시
+        function setTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            const day = days[today.getDay()];
+            document.getElementById('today-date').textContent =
+                `${yyyy}년 ${mm}월 ${dd}일 ${day}요일`;
+        }
+        setTodayDate();
+
+        // 교시 박스 클릭 방식
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        let totalSeconds = 60;
+        let remaining = 60;
+        let timerInterval = null;
+        let running = false;
+
+        function updateDisplay() {
+            const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+            const secs = String(remaining % 60).padStart(2, '0');
+            document.getElementById('timer').textContent = `${mins}:${secs}`;
+        }
+
+        function showAlertBanner(message) {
+            const banner = document.getElementById('alert-banner');
+            banner.textContent = message;
+            banner.style.display = 'block';
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 30000);
+        }
+
+        function startTimer() {
+            if (running) return;
+            running = true;
+            if (remaining <= 0) return;
+            timerInterval = setInterval(() => {
+                if (remaining > 0) {
+                    remaining--;
+
+                    // 5분 전 안내 (음성+배너)
+                    if (remaining === 300) {
+                        speak('종료 5분 전입니다. 빠진 문항이 없는 지 확인하세요.');
+                        showAlertBanner('종료 5분전');
+                    }
+                    // 2분 전 안내 (음성+배너)
+                    if (remaining === 120) {
+                        speak('종료 2분전입니다.');
+                        showAlertBanner('종료 2분전');
+                    }
+
+                    updateDisplay();
+                }
+                if (remaining === 0) {
+                    clearInterval(timerInterval);
+                    running = false;
+                    document.getElementById('alarm').play();
+                    alert('시간이 종료되었습니다!');
+                }
+            }, 1000);
+        }
+
+        // 음성 안내 함수
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'ko-KR';
+                window.speechSynthesis.speak(utter);
+            }
+        }
+
+        function pauseTimer() {
+            running = false;
+            clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            totalSeconds = 0;
+            remaining = 0;
+            updateDisplay();
+            window.timerJustReset = true;
+        }
+
+        // 시간 선택 박스 클릭 이벤트
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.disabled = false;
+            btn.addEventListener('click', function() {
+                const min = parseInt(this.getAttribute('data-min'), 10);
+                const sec = parseInt(this.getAttribute('data-sec'), 10);
+
+                // 리셋 직후면 누적하지 않고 해당 시간만 설정
+                if (window.timerJustReset) {
+                    window.timerJustReset = false;
+                    totalSeconds = min * 60 + sec;
+                    remaining = min * 60 + sec;
+                } else {
+                    totalSeconds += min * 60 + sec;
+                    remaining += min * 60 + sec;
+                }
+                updateDisplay();
+
+                // 시각적 효과(클릭된 버튼만 잠깐 강조)
+                this.classList.add('selected');
+                setTimeout(() => this.classList.remove('selected'), 200);
+            });
+        });
+
+        // 초기화
+        resetTimer();
+    </script>
+</body>
+</html>
